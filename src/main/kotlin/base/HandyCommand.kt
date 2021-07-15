@@ -35,6 +35,14 @@ abstract class HandyCommand() : Subscribable {
         return command!!
     }
 
+    fun simpleResponse(ctx: SlashCommandInteraction, content: String) {
+        ctx.createImmediateResponder().setContent(content).respond()
+    }
+
+    fun simpleUserOnlyResponse(ctx: SlashCommandInteraction, content: String) {
+        ctx.createImmediateResponder().setContent(content).setFlags(MessageFlag.EPHEMERAL).respond()
+    }
+
     fun builder(name: String, description: String) = SlashCommandBuilder().setName(name).setDescription(description)
 
     abstract fun register(): SlashCommandBuilder
