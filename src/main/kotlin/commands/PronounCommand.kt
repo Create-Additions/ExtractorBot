@@ -31,7 +31,7 @@ class PronounCommand : HandyCommand() {
         val p = getPronounRoles()
         val chosenRole = ctx.firstOption.get().firstOption.get().stringValue.get()
         val role = p.find { it.id.toString() == chosenRole }!!
-        val add = ctx.firstOption.get().equals("add")
+        val add = ctx.firstOption.get().name.equals("add")
         if(add) {
             ctx.user.addRole(role)
         } else {
