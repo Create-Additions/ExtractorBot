@@ -10,6 +10,7 @@ import org.javacord.api.entity.message.component.ActionRow
 import org.javacord.api.entity.message.component.Button
 import org.javacord.api.exception.BadRequestException
 import org.javacord.api.interaction.*
+import java.util.*
 
 @Subscribe
 class ApplyCommand : HandyCommand() {
@@ -52,34 +53,30 @@ class ApplyCommand : HandyCommand() {
         val curseforge = o.getOptionByName("curseforge")
         val links = hashMapOf<String, String>()
         b.appendNewLine().append(content)
+        fun site(v2: String, n: String) {
+            val v = o.getOptionByName(v2)
+            if(v.isPresent) {
+                links[n] = v.get().stringValue.get()
+            }
+        }
+        fun site(n: String) = site(n.capitalize(), n)
         if(discord.isPresent) {
             val v = discord.get().stringValue.get()
             b.appendNewLine().append("Discord: $v")
         }
-        if(website.isPresent) {
-            val v = website.get().stringValue.get()
-//            b.appendNewLine().append("Website: $v")
-            links["Website"] = v
-        }
-        if(github.isPresent) {
-            val v = github.get().stringValue.get()
-//            b.appendNewLine().append("Github: $v")
-            links["Github"] = v
-        }
-        if(curseforge.isPresent) {
-            val v = curseforge.get().stringValue.get()
-//            b.appendNewLine().append("Curseforge: $v")
-            links["Curseforge"] = v
-        }
+        site("website")
+        site("github")
+        site("CurseForge", "curseforge")
         if(links.isNotEmpty()) {
             b.addComponents(ActionRow.of(
                 *links.map { Button.link(it.value, it.key) }.toTypedArray()
             ))
         }
-        simpleUserOnlyResponse(ctx, "Application sent")
-        b.send(appChannel).handle { message: Message?, throwable: Throwable ->
-            ctx.createFollowupMessageBuilder().setFlags(MessageFlag.EPHEMERAL).setContent("Unable to send application (is one of the links invalid?)").send()
-        }
+        simpleUserOnlyResponse(ctx, "Sending application")
+        b.send(appChannel).handle { message: Message?, throwable: Throwable? ->
+                    ctx.createFollowupMessageBuilder().setFlags(MessageFlag.EPHEMERAL)
+                        .setContent(if(throwable != null) "Unable to send application (is one of the links invalid?)" else "Application sent").send()
+        }.get().get()
     }
 }
 
