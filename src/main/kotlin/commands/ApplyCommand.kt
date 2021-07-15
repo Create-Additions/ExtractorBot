@@ -5,6 +5,7 @@ import base.Subscribe
 import data.HandyConfig
 import org.javacord.api.entity.message.Message
 import org.javacord.api.entity.message.MessageBuilder
+import org.javacord.api.entity.message.MessageFlag
 import org.javacord.api.entity.message.component.ActionRow
 import org.javacord.api.entity.message.component.Button
 import org.javacord.api.exception.BadRequestException
@@ -75,10 +76,9 @@ class ApplyCommand : HandyCommand() {
                 *links.map { Button.link(it.value, it.key) }.toTypedArray()
             ))
         }
-        val u = ctx.respondLater().get().setContent("Application sent")
-        u.update()
+        simpleUserOnlyResponse(ctx, "Application sent")
         b.send(appChannel).handle { message: Message?, throwable: Throwable ->
-            u.setContent("Unable to send application (is one of the links invalid?)").update()
+            ctx.createFollowupMessageBuilder().setFlags(MessageFlag.EPHEMERAL).setContent("Unable to send application (is one of the links invalid?)").send()
         }
     }
 }
