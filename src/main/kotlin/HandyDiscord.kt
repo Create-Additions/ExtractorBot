@@ -1,3 +1,4 @@
+import base.HandyCommand
 import data.HandyConfig
 import org.javacord.api.DiscordApi
 import org.javacord.api.DiscordApiBuilder
@@ -11,5 +12,6 @@ object HandyDiscord {
     fun create() {
         api = DiscordApiBuilder().setToken(token).setAllIntents().login().join()
         HandySubscriptions.findAndSubscribe()
+        HandyCommand.registerComponentSubscriber()
     }
 }

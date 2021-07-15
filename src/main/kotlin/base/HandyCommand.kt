@@ -2,15 +2,33 @@ package base
 
 import HandyDiscord.api
 import data.HandyConfig
+import org.javacord.api.entity.emoji.Emoji
 import org.javacord.api.entity.message.MessageFlag
+import org.javacord.api.entity.message.component.Button
+import org.javacord.api.entity.message.component.ButtonStyle
+import org.javacord.api.event.interaction.MessageComponentCreateEvent
 import org.javacord.api.event.interaction.SlashCommandCreateEvent
-import org.javacord.api.interaction.SlashCommand
-import org.javacord.api.interaction.SlashCommandBuilder
-import org.javacord.api.interaction.SlashCommandInteraction
-import org.javacord.api.interaction.SlashCommandUpdater
+import org.javacord.api.interaction.*
+import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder
+import java.util.function.BiConsumer
 import java.util.function.Consumer
+import java.util.function.UnaryOperator
 
-abstract class HandyCommand() : Subscribable {
+abstract class HandyCommand : Subscribable {
+    companion object {
+        private var lastComponentId = 0
+        private val components = hashMapOf<String, BiConsumer<MessageComponentCreateEvent, MessageComponentInteraction>>()
+
+        fun registerComponentSubscriber() {
+            api!!.addMessageComponentCreateListener {
+                val interaction = it.messageComponentInteraction
+                if(components.containsKey(interaction.customId)) {
+                    components[interaction.customId]!!.accept(it, interaction)
+                }
+            }
+        }
+    }
+
     var command: SlashCommand? = null
 
     override fun subscribe() {
@@ -35,13 +53,26 @@ abstract class HandyCommand() : Subscribable {
         return command!!
     }
 
-    fun simpleResponse(ctx: SlashCommandInteraction, content: String) {
-        ctx.createImmediateResponder().setContent(content).respond()
+    fun addComponentSubscriber(name: String = "", onPress: BiConsumer<MessageComponentCreateEvent, MessageComponentInteraction>): String {
+        val id = name + lastComponentId++
+        components[id] = onPress
+        return id
     }
 
-    fun simpleUserOnlyResponse(ctx: SlashCommandInteraction, content: String) {
-        ctx.createImmediateResponder().setContent(content).setFlags(MessageFlag.EPHEMERAL).respond()
+    fun simpleResponse(ctx: SlashCommandInteraction, content: String, transform: Consumer<InteractionImmediateResponseBuilder>? = null) {
+        val b = ctx.createImmediateResponder().setContent(content)
+        transform?.accept(b)
+        b.respond()
     }
+
+    fun simpleUserOnlyResponse(ctx: SlashCommandInteraction, content: String, transform: Consumer<InteractionImmediateResponseBuilder>? = null) {
+        simpleResponse(ctx, content) { b ->
+            b.setFlags(MessageFlag.EPHEMERAL)
+            transform?.accept(b)
+        }
+    }
+
+    fun getNextComponentId() = lastComponentId++
 
     fun builder(name: String, description: String) = SlashCommandBuilder().setName(name).setDescription(description)
 
