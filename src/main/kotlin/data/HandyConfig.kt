@@ -25,6 +25,8 @@ class HandyConfig : HandyData.Data<HandyConfig> {
     var suggestionChannel = ""
     @SerializedName("applyChannel")
     var applyChannel = ""
+    @SerializedName("ideaRole")
+    var ideaRole = "865251596409503774"
 
     fun getToken() = discordToken
     fun isDev() = dev
