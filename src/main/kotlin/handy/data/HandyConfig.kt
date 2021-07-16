@@ -35,6 +35,9 @@ class HandyConfig : HandyData.Data<HandyConfig> {
     @SerializedName("devRole")
     var devRole = ""
 
+    @SerializedName("funnyButton")
+    var funnyButton = true
+
     fun getToken() = discordToken
     fun isDev() = dev
     fun getServer() = mainServer
