@@ -1,18 +1,14 @@
-package base
+package handy.base
 
-import HandyDiscord.api
-import data.HandyConfig
-import org.javacord.api.entity.emoji.Emoji
+import handy.HandyDiscord.api
+import handy.data.HandyConfig
 import org.javacord.api.entity.message.MessageFlag
-import org.javacord.api.entity.message.component.Button
-import org.javacord.api.entity.message.component.ButtonStyle
 import org.javacord.api.event.interaction.MessageComponentCreateEvent
 import org.javacord.api.event.interaction.SlashCommandCreateEvent
 import org.javacord.api.interaction.*
 import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder
 import java.util.function.BiConsumer
 import java.util.function.Consumer
-import java.util.function.UnaryOperator
 
 abstract class HandyCommand : Subscribable {
     companion object {

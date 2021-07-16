@@ -1,5 +1,7 @@
-import base.Subscribable
-import base.Subscribe
+package handy
+
+import handy.base.Subscribable
+import handy.base.Subscribe
 import org.reflections.Reflections
 import java.lang.IllegalStateException
 
@@ -7,7 +9,7 @@ object HandySubscriptions {
     lateinit var subscribables: Set<Class<*>>;
 
     fun findAndSubscribe() {
-        subscribables = Reflections("").getTypesAnnotatedWith(Subscribe::class.java)
+        subscribables = Reflections("handy").getTypesAnnotatedWith(Subscribe::class.java)
         subscribables.forEach {
             val i = it.getConstructor().newInstance()
             if(i is Subscribable) {

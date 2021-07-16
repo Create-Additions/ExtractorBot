@@ -1,17 +1,15 @@
-package commands
+package handy.commands
 
-import base.HandyCommand
-import base.Subscribe
-import data.HandyConfig
+import handy.base.HandyCommand
+import handy.base.Subscribe
+import handy.data.HandyConfig
 import org.javacord.api.entity.message.Message
 import org.javacord.api.entity.message.MessageBuilder
 import org.javacord.api.entity.message.MessageFlag
 import org.javacord.api.entity.message.component.ActionRow
 import org.javacord.api.entity.message.component.Button
 import org.javacord.api.event.interaction.MessageComponentCreateEvent
-import org.javacord.api.exception.BadRequestException
 import org.javacord.api.interaction.*
-import java.util.*
 
 @Subscribe
 class ApplyCommand : HandyCommand() {

@@ -1,10 +1,8 @@
-package commands
+package handy.commands
 
-import base.HandyCommand
-import base.Subscribe
+import handy.base.HandyCommand
+import handy.base.Subscribe
 import org.javacord.api.entity.message.MessageFlag
-import org.javacord.api.interaction.SlashCommand
-import org.javacord.api.interaction.SlashCommandBuilder
 import org.javacord.api.interaction.SlashCommandInteraction
 
 @Subscribe

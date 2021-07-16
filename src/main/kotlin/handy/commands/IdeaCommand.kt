@@ -1,12 +1,10 @@
-package commands
+package handy.commands
 
-import HandyDiscord.api
-import base.HandyCommand
-import base.Subscribe
-import data.HandyConfig
+import handy.base.HandyCommand
+import handy.HandyDiscord.api
+import handy.base.Subscribe
+import handy.data.HandyConfig
 import org.javacord.api.entity.message.MessageBuilder
-import org.javacord.api.entity.message.MessageFlag
-import org.javacord.api.entity.permission.Role
 import org.javacord.api.interaction.*
 
 @Subscribe

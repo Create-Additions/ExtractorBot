@@ -1,7 +1,6 @@
-package data
+package handy.data
 
 import com.google.gson.annotations.SerializedName
-import org.javacord.api.DiscordApi
 import java.util.*
 
 class HandyPronouns : HandyData.Data<HandyPronouns>(HandyData.get("pronouns.json"), HandyPronouns::class.java) {

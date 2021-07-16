@@ -1,8 +1,6 @@
-package data
+package handy.data
 
-import com.google.gson.GsonBuilder
 import com.google.gson.annotations.SerializedName
-import com.google.gson.reflect.TypeToken
 
 
 class HandyConfig : HandyData.Data<HandyConfig> {

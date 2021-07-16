@@ -1,3 +1,3 @@
-package base
+package handy.base
 
 annotation class Subscribe()

@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.4.32"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 group = "com.kotakotik"
@@ -25,4 +26,13 @@ tasks.test {
 
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+
+tasks.jar {
+    manifest {
+        attributes(
+            "Main-Class" to "handy.Handy"
+        )
+    }
 }

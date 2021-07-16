@@ -1,9 +1,9 @@
-import base.HandyCommand
-import data.HandyConfig
+package handy
+
+import handy.base.HandyCommand
+import handy.data.HandyConfig
 import org.javacord.api.DiscordApi
 import org.javacord.api.DiscordApiBuilder
-import org.javacord.api.entity.message.MessageFlag
-import org.javacord.api.event.interaction.SlashCommandCreateEvent
 
 object HandyDiscord {
     val token = HandyConfig.get().getToken()

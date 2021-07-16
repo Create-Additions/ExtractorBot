@@ -1,9 +1,9 @@
-package commands
+package handy.commands
 
-import HandyDiscord.api
-import base.HandyCommand
-import base.Subscribe
-import data.HandyPronouns
+import handy.base.HandyCommand
+import handy.HandyDiscord.api
+import handy.base.Subscribe
+import handy.data.HandyPronouns
 import org.javacord.api.entity.permission.Role
 import org.javacord.api.interaction.*
 
