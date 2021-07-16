@@ -8,6 +8,7 @@ import org.javacord.api.entity.message.MessageBuilder
 import org.javacord.api.entity.message.MessageFlag
 import org.javacord.api.entity.message.component.ActionRow
 import org.javacord.api.entity.message.component.Button
+import org.javacord.api.event.interaction.MessageComponentCreateEvent
 import org.javacord.api.exception.BadRequestException
 import org.javacord.api.interaction.*
 import java.util.*
@@ -42,6 +43,26 @@ class ApplyCommand : HandyCommand() {
         return b
     }
 
+    fun acceptComponent(roleId: String, event: MessageComponentCreateEvent, interaction: MessageComponentInteraction) {
+        val forUser = interaction.message.get().mentionedUsers[0]
+        val d = HandyConfig.get().devRole
+        forUser.addRole(event.api.getRoleById(d).get()).join()
+        forUser.addRole(event.api.getRoleById(roleId).get()).join()
+        interaction.createImmediateResponder().setFlags(MessageFlag.EPHEMERAL)
+            .setContent("Given ${forUser.mentionTag} roles <@&${d}> and <@&${roleId}>")
+            .respond()
+    }
+
+    val acceptCoderComponent = addComponentSubscriber { e, i ->
+        acceptComponent(HandyConfig.get().coderRole, e, i)
+    }
+    val acceptArtistComponent = addComponentSubscriber { e, i ->
+        acceptComponent(HandyConfig.get().artRole, e, i)
+    }
+    val acceptPackerComponent = addComponentSubscriber { e, i ->
+        acceptComponent(HandyConfig.get().packRole, e, i)
+    }
+
     override fun onCalled(ctx: SlashCommandInteraction) {
         val appChannel = ctx.api.getChannelById(HandyConfig.get().applyChannel).get().asServerTextChannel().get()
         val b = MessageBuilder().append("${ctx.user.mentionTag}'s application:")
@@ -72,6 +93,11 @@ class ApplyCommand : HandyCommand() {
                 *links.map { Button.link(it.value, it.key) }.toTypedArray()
             ))
         }
+        b.addComponents(ActionRow.of(
+            Button.secondary(acceptCoderComponent, "Add coder role"),
+            Button.secondary(acceptArtistComponent, "Add artist role"),
+            Button.secondary(acceptPackerComponent, "Add modpack role")
+        ))
         simpleUserOnlyResponse(ctx, "Sending application")
         b.send(appChannel).handle { message: Message?, throwable: Throwable? ->
                     ctx.createFollowupMessageBuilder().setFlags(MessageFlag.EPHEMERAL)

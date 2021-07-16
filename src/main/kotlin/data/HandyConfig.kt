@@ -28,6 +28,15 @@ class HandyConfig : HandyData.Data<HandyConfig> {
     @SerializedName("ideaRole")
     var ideaRole = "865251596409503774"
 
+    @SerializedName("coderRole")
+    var coderRole = ""
+    @SerializedName("artRole")
+    var artRole = ""
+    @SerializedName("packRole")
+    var packRole = ""
+    @SerializedName("devRole")
+    var devRole = ""
+
     fun getToken() = discordToken
     fun isDev() = dev
     fun getServer() = mainServer
