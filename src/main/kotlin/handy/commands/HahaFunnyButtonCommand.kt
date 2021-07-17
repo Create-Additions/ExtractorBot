@@ -17,7 +17,14 @@ import org.javacord.api.interaction.SlashCommandOptionType
 
 @Subscribe
 class HahaFunnyButtonCommand : HandyCommand() {
-    fun getText(user: String, times: String) = "Clicked $times times, last clicked by $user"
+    fun getText(user: String, times: String, isOff: Boolean): String {
+        var s = "Clicked $times times, last clicked by $user"
+        if(isOff) {
+            s += "_"
+            s = "_$s"
+        }
+        return s
+    }
     fun getCount(content: String) = content.split(" ")[1].replace(",", "")
 
     override fun register(): SlashCommandBuilder {
@@ -29,26 +36,34 @@ class HahaFunnyButtonCommand : HandyCommand() {
         )
     }
 
-    val button = addComponentSubscriber { event, interaction ->
-        if(HandyConfig.get().funnyButton) {
-            interaction.createOriginalMessageUpdater().setContent(getText(interaction.user.mentionTag, (getCount(interaction.message.get().content).toInt() + 1).toString()))
+    val button: String = addComponentSubscriber { event, interaction ->
+        val isOff = isOff(interaction.message.get().content)
+        if(HandyConfig.get().funnyButton && !isOff) {
+            interaction.createOriginalMessageUpdater().setContent(getText(interaction.user.mentionTag, (getCount(interaction.message.get().content).toInt() + 1).toString(), isOff))
                 .addComponents(ActionRow.of(
                     Button.primary(interaction.customId, "haha funny button"),
-                    Button.secondary(turnOff, "Turn off funny button :(")
+                    Button.secondary(toggle, "toggle funny button")
                 )).update()
         } else {
             interaction.createImmediateResponder().setFlags(MessageFlag.EPHEMERAL).setContent("The funny button is currently disabled :(").respond()
         }
     }
 
+    fun isOff(m: String) = m.startsWith("_") && m.endsWith("_")
+
     fun canControlButton(user: User, server: Server) =
         user.getRoles(server).any {it.permissions.getState(PermissionType.MANAGE_CHANNELS).equals(PermissionState.ALLOWED)}
 
-    val turnOff = addComponentSubscriber {event, interaction ->
+    val toggle: String = addComponentSubscriber { event, interaction ->
         val str: String
+        val isOff = isOff(interaction.message.get().content)
         if(canControlButton(interaction.user, interaction.server.get())) {
-            HandyConfig.get().funnyButton = false
-            str = "funny button disabled"
+            str = "funny button ${if(isOff) "enabled" else "disabled"}"
+            interaction.createOriginalMessageUpdater().addComponents(ActionRow.of(
+                Button.primary(button, "haha funny button"),
+                Button.secondary(interaction.customId, "toggle funny button")
+            ))
+                .setContent(getText(interaction.user.mentionTag, (getCount(interaction.message.get().content).toInt() + 1).toString(), !isOff)).update()
         } else {
             str = "you dont have enough perms to turn off the button and ruin the fun"
         }
@@ -57,10 +72,10 @@ class HahaFunnyButtonCommand : HandyCommand() {
 
     override fun onCalled(ctx: SlashCommandInteraction) {
         if(canControlButton(ctx.user, ctx.server.get())) {
-            simpleResponse(ctx, getText("nobody", "0")) {
+            simpleResponse(ctx, getText("nobody", "0", false)) {
                 it.addComponents(ActionRow.of(
                     Button.primary(button, "haha funny button"),
-                    Button.secondary(turnOff, "Turn off funny button :(")
+                    Button.secondary(toggle, "toggle funny button")
                 ))
             }
         } else {
