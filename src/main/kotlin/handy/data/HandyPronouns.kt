@@ -1,24 +1,26 @@
 package handy.data
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.util.*
 
-class HandyPronouns : HandyData.Data<HandyPronouns>(HandyData.get("pronouns.json"), HandyPronouns::class.java) {
+@Serializable
+class HandyPronouns {
     companion object {
+        val file = HandyData.get("pronouns.json")
         var INSTANCE: Optional<HandyPronouns> = Optional.empty();
 
         fun get(): HandyPronouns {
             return INSTANCE.orElseGet {
-                INSTANCE = Optional.of(HandyData.deserialize("pronouns.json", HandyPronouns::class.java))
+                INSTANCE = Optional.of(Json.decodeFromString(file.readText()))
                 return@orElseGet INSTANCE.get()
             }
         }
     }
 
-    @SerializedName("pronouns")
     var pronouns: List<Pronoun> = emptyList()
 
-    data class Pronoun(@SerializedName("id") val id: String)
-
-    override fun getThis() = this
+    @Serializable
+    data class Pronoun(val id: String)
 }

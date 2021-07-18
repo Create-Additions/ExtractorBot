@@ -1,53 +1,34 @@
 package handy.data
 
-import com.google.gson.annotations.SerializedName
+import handy.Handy.json
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-
-class HandyConfig : HandyData.Data<HandyConfig> {
+@Serializable
+data class HandyConfig(val discordToken: String, var isDev: Boolean = true, var suggestionChannel: String = "",
+                       var mainServer: String = "", var applyChannel: String = "", var ideaRole: String = "",
+                       var coderRole: String = "", var artRole: String = "", var packRole: String = "",
+                       var devRole: String = "", var funnyButton: Boolean = true
+) {
     companion object {
-        var INSTANCE: HandyConfig? = null;
+        val file = HandyData.get("config.json")
+        var INSTANCE: HandyConfig? = null
 
         fun get(): HandyConfig {
             if(INSTANCE != null) return INSTANCE as HandyConfig;
-            return HandyData.deserialize("config.json", HandyConfig::class.java)
+            INSTANCE = json.decodeFromString(file.readText())
+            return INSTANCE!!
         }
     }
 
-    @SerializedName("token")
-    var discordToken = ""
-    @SerializedName("dev")
-    var dev = true
-    @SerializedName("mainServer")
-    var mainServer = ""
-    @SerializedName("suggestionChannel")
-    var suggestionChannel = ""
-    @SerializedName("applyChannel")
-    var applyChannel = ""
-    @SerializedName("ideaRole")
-    var ideaRole = "865251596409503774"
-
-    @SerializedName("coderRole")
-    var coderRole = ""
-    @SerializedName("artRole")
-    var artRole = ""
-    @SerializedName("packRole")
-    var packRole = ""
-    @SerializedName("devRole")
-    var devRole = ""
-
-    @SerializedName("funnyButton")
-    var funnyButton = true
-
-    fun getToken() = discordToken
-    fun isDev() = dev
-    fun getServer() = mainServer
-
-    constructor() : super(HandyData.get("config.json"), HandyConfig::class.java) {
+    init {
         INSTANCE = this
     }
 
-    override fun getThis(): HandyConfig {
+    fun save(): HandyConfig {
+        file.writeText(Json.encodeToString(this))
         return this
     }
-
 }

@@ -29,7 +29,7 @@ abstract class HandyCommand : Subscribable {
 
     override fun subscribe() {
         val b = register()
-        command = ((if (HandyConfig.get().isDev()) b.createForServer(api!!.getServerById(HandyConfig.get().getServer()).get()) else b.createGlobal(api))).join()
+        command = ((if (HandyConfig.get().isDev) b.createForServer(api!!.getServerById(HandyConfig.get().mainServer).get()) else b.createGlobal(api))).join()
         api!!.addSlashCommandCreateListener { event: SlashCommandCreateEvent ->
             val slashCommandInteraction = event.slashCommandInteraction
             if (slashCommandInteraction.commandName == command!!.name) {
@@ -45,7 +45,7 @@ abstract class HandyCommand : Subscribable {
     fun updateCommand(transform: Consumer<SlashCommandUpdater>): SlashCommand {
         val u = SlashCommandUpdater(command!!.id)
         transform.accept(u)
-        command = (if(HandyConfig.get().isDev()) u.updateForServer(api!!.getServerById(HandyConfig.get().getServer()).get()) else u.updateGlobal(api!!)).join()
+        command = (if(HandyConfig.get().isDev) u.updateForServer(api!!.getServerById(HandyConfig.get().mainServer).get()) else u.updateGlobal(api!!)).join()
         return command!!
     }
 
