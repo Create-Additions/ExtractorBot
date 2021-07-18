@@ -42,11 +42,11 @@ class CurseChecker : Subscribable {
             .appendNewLine()
             .append("```")
             .append {
-                try {
-                    return@append file.changelogPlainText()
-                } catch (e: CurseException) {
+                val text = file.changelogPlainText()
+                if(text.isEmpty()) {
                     return@append "No changelog provided"
                 }
+                return@append text
             }
             .append("```")
             .addActionRow(
