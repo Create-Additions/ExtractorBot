@@ -19,7 +19,7 @@ data class HandyConfig(val discordToken: String, var isDev: Boolean = true, var 
         fun get(): HandyConfig {
             if(INSTANCE != null) return INSTANCE as HandyConfig;
             INSTANCE = json.decodeFromString(file.readText())
-            return INSTANCE!!
+            return INSTANCE!!.save()
         }
     }
 
@@ -28,7 +28,7 @@ data class HandyConfig(val discordToken: String, var isDev: Boolean = true, var 
     }
 
     fun save(): HandyConfig {
-        file.writeText(Json.encodeToString(this))
+        file.writeText(json.encodeToString(this))
         return this
     }
 }
