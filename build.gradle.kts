@@ -11,6 +11,7 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -19,6 +20,7 @@ dependencies {
     implementation(kotlin("script-runtime"))
     implementation("org.reflections:reflections:0.9.12")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+    api("com.github.TheRandomLabs:CurseAPI:master-SNAPSHOT")
 }
 
 tasks.test {
