@@ -30,9 +30,6 @@ class CurseCommand : AdminCommand("curse") {
             CurseAPI.project(string.toInt())
         } else (
             try {
-                println(HttpUrl.get(string).encodedPath())
-                println(CurseAPI.project(HttpUrl.get(string)))
-                println(CurseAPI.project(HttpUrl.get(string)))
                 CurseAPI.project(HttpUrl.get(string))
             } catch (e: Exception) {
                 return Optional.empty()
