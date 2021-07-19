@@ -9,6 +9,14 @@ import org.javacord.api.interaction.*
 
 @Subscribe
 class PronounCommand : HandyCommand("pronouns") {
+    companion object {
+        var INSTANCE: PronounCommand? = null
+    }
+
+    init {
+        INSTANCE = this
+    }
+
     override fun register(): SlashCommandBuilder {
         return SlashCommandBuilder().setName(id).setDescription("Add or remove pronouns")
             .addOption(SlashCommandOption.createWithOptions(SlashCommandOptionType.SUB_COMMAND, "add", "Add pronouns",

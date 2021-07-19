@@ -6,9 +6,10 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.*
+import kotlin.collections.ArrayList
 
 @Serializable
-class HandyPronouns(val pronouns: List<Pronoun>) {
+class HandyPronouns(val pronouns: ArrayList<Pronoun>) {
     companion object {
         val file = HandyData.get("pronouns.json")
         var INSTANCE: Optional<HandyPronouns> = Optional.empty();
