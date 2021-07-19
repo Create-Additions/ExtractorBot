@@ -3,6 +3,7 @@ package handy.commands
 import handy.base.HandyCommand
 import handy.base.Subscribe
 import handy.data.HandyConfig
+import org.javacord.api.entity.message.Message
 import org.javacord.api.entity.message.MessageFlag
 import org.javacord.api.entity.message.component.ActionRow
 import org.javacord.api.entity.message.component.Button
@@ -24,6 +25,7 @@ class HahaFunnyButtonCommand : HandyCommand("haha") {
         return s
     }
     fun getCount(content: String) = content.split(" ")[1].replace(",", "")
+    fun getUser(msg: Message) = msg.mentionedUsers[0]
 
     override fun register(): SlashCommandBuilder {
         return builder(description = "fun").addOption(
@@ -74,7 +76,7 @@ class HahaFunnyButtonCommand : HandyCommand("haha") {
                 Button.primary(button, "haha funny button"),
                 Button.secondary(interaction.customId, "toggle funny button")
             ))
-                .setContent(getText(interaction.user.mentionTag, (getCount(interaction.message.get().content).toInt() + 1).toString(), !isOff)).update()
+                .setContent(getText(getUser(interaction.message.get()).mentionTag, getCount(interaction.message.get().content), !isOff)).update()
         } else {
             str = "you dont have enough perms to turn off the button and ruin the fun"
         }
