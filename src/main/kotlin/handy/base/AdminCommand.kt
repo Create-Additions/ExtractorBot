@@ -3,7 +3,6 @@ package handy.base
 import org.javacord.api.entity.permission.PermissionState
 import org.javacord.api.entity.permission.PermissionType
 import org.javacord.api.interaction.SlashCommandBuilder
-import org.javacord.api.interaction.SlashCommandInteraction
 import org.javacord.api.interaction.SlashCommandPermissionType
 import org.javacord.api.interaction.SlashCommandPermissions
 

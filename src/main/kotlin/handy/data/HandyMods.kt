@@ -12,9 +12,10 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.*
+import kotlin.collections.ArrayList
 
 @Serializable
-class HandyMods(val mods: List<Mod> = emptyList()) {
+class HandyMods(val mods: ArrayList<Mod> = ArrayList()) {
     companion object{
         val file = HandyData.get("mods.json")
         var INSTANCE: Optional<HandyMods> = Optional.empty();

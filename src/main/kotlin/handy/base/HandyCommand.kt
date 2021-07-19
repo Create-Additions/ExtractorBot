@@ -11,6 +11,7 @@ import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder
 import java.util.*
 import java.util.function.BiConsumer
 import java.util.function.Consumer
+import java.util.function.UnaryOperator
 
 abstract class HandyCommand(val id: String) : Subscribable {
     companion object {
@@ -43,8 +44,8 @@ abstract class HandyCommand(val id: String) : Subscribable {
 
     open fun afterCommandRegistered() {}
 
-    fun setCommandPermissions(server: Server, vararg p: SlashCommandPermissions) {
-        SlashCommandPermissionsUpdater(server).setPermissions(p.toMutableList()).update(command!!.id)
+    fun setCommandPermissions(server: Server, vararg p: SlashCommandPermissions, o: (SlashCommandPermissionsUpdater) -> SlashCommandPermissionsUpdater = { i:SlashCommandPermissionsUpdater -> i}) {
+        o(SlashCommandPermissionsUpdater(server).setPermissions(p.toMutableList())).update(command!!.id)
     }
 
     fun simpleCommand(name: String = id, description: String): SlashCommandBuilder? {
