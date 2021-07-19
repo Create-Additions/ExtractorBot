@@ -12,9 +12,9 @@ import org.javacord.api.interaction.*
 class PronounsListCommand : AdminCommand("pronouns_list") {
     override fun createCommand(): SlashCommandBuilder {
         return builder(description = "test")
-            .addOption(SlashCommandOption.createWithOptions(SlashCommandOptionType.SUB_COMMAND, "add", "Add pronouns",
+            .addOption(SlashCommandOption.createWithOptions(SlashCommandOptionType.SUB_COMMAND, "add", "Add pronouns to the list",
                 listOf(SlashCommandOption.create(SlashCommandOptionType.ROLE, "role","The pronouns to add", true))))
-            .addOption(SlashCommandOption.createWithOptions(SlashCommandOptionType.SUB_COMMAND, "remove", "Remove pronouns",
+            .addOption(SlashCommandOption.createWithOptions(SlashCommandOptionType.SUB_COMMAND, "remove", "Remove pronouns from the list",
                 listOf(SlashCommandOption.createWithChoices(SlashCommandOptionType.ROLE, "role","The pronouns to remove", true))))
     }
 
@@ -36,6 +36,6 @@ class PronounsListCommand : AdminCommand("pronouns_list") {
             SlashCommandOption.createWithOptions(SlashCommandOptionType.SUB_COMMAND, "remove", "Remove pronouns",
                 listOf(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "name","The pronouns to remove", true, instance.getPronouns())))))
             .updateForServer(getServer())
-        simpleUserOnlyResponse(ctx, "mMM")
+        simpleUserOnlyResponse(ctx, "Role ${chosenRole.mentionTag} ${if(add) "added to the list" else "removed from the list"}")
     }
 }
