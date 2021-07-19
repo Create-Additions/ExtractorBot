@@ -12,7 +12,7 @@ import org.javacord.api.event.interaction.MessageComponentCreateEvent
 import org.javacord.api.interaction.*
 
 @Subscribe
-class ApplyCommand : HandyCommand() {
+class ApplyCommand : HandyCommand("apply") {
     enum class ApplicationType(val description: String) {
         MOD("Apply with your mod"),
         MODPACK("Apply with your modpack");
@@ -25,7 +25,7 @@ class ApplyCommand : HandyCommand() {
     }
 
     override fun register(): SlashCommandBuilder {
-        val b = builder("apply", "Apply for a developer role")
+        val b = builder(description = "Apply for a developer role")
         ApplicationType.values().map {
             b.addOption(SlashCommandOption.createWithOptions(SlashCommandOptionType.SUB_COMMAND, it.name, it.description, listOf(
                 SlashCommandOption.create(SlashCommandOptionType.STRING, "application", "Describe what you're applying for", true),

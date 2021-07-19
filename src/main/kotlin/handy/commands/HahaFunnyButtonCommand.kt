@@ -8,15 +8,13 @@ import org.javacord.api.entity.message.component.ActionRow
 import org.javacord.api.entity.message.component.Button
 import org.javacord.api.entity.permission.PermissionState
 import org.javacord.api.entity.permission.PermissionType
+import org.javacord.api.entity.permission.Role
 import org.javacord.api.entity.server.Server
 import org.javacord.api.entity.user.User
-import org.javacord.api.interaction.SlashCommandBuilder
-import org.javacord.api.interaction.SlashCommandInteraction
-import org.javacord.api.interaction.SlashCommandOption
-import org.javacord.api.interaction.SlashCommandOptionType
+import org.javacord.api.interaction.*
 
 @Subscribe
-class HahaFunnyButtonCommand : HandyCommand() {
+class HahaFunnyButtonCommand : HandyCommand("haha") {
     fun getText(user: String, times: String, isOff: Boolean): String {
         var s = "Clicked $times times, last clicked by $user"
         if(isOff) {
@@ -28,12 +26,22 @@ class HahaFunnyButtonCommand : HandyCommand() {
     fun getCount(content: String) = content.split(" ")[1].replace(",", "")
 
     override fun register(): SlashCommandBuilder {
-        return builder("haha", "fun").addOption(
-           SlashCommandOption.createWithOptions(
-               SlashCommandOptionType.SUB_COMMAND_GROUP, "funny", "fun",
-               listOf(SlashCommandOption.create(SlashCommandOptionType.SUB_COMMAND, "button", "yes"))
-           )
-        )
+        return builder(description = "fun").addOption(
+            SlashCommandOption.createWithOptions(
+                SlashCommandOptionType.SUB_COMMAND_GROUP, "funny", "fun",
+                listOf(SlashCommandOption.create(SlashCommandOptionType.SUB_COMMAND, "button", "yes"))
+            )
+        ).setDefaultPermission(false)
+    }
+
+    override fun afterCommandRegistered() {
+        val s = getServer()
+        setCommandPermissions(s,
+            *s.roles.map {
+                return@map if(canControlButton(listOf(it)))
+                    SlashCommandPermissions.create(it.id, SlashCommandPermissionType.ROLE, true)
+                else null
+            }.filterNotNull().toTypedArray())
     }
 
     val button: String = addComponentSubscriber { event, interaction ->
@@ -51,8 +59,11 @@ class HahaFunnyButtonCommand : HandyCommand() {
 
     fun isOff(m: String) = m.startsWith("_") && m.endsWith("_")
 
+    fun canControlButton(roles: List<Role>) =
+        roles.any {it.permissions.getState(PermissionType.MANAGE_CHANNELS).equals(PermissionState.ALLOWED)}
+
     fun canControlButton(user: User, server: Server) =
-        user.getRoles(server).any {it.permissions.getState(PermissionType.MANAGE_CHANNELS).equals(PermissionState.ALLOWED)}
+        canControlButton(user.getRoles(server))
 
     val toggle: String = addComponentSubscriber { event, interaction ->
         val str: String

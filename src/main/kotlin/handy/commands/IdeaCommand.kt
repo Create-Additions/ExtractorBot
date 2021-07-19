@@ -8,9 +8,9 @@ import org.javacord.api.entity.message.MessageBuilder
 import org.javacord.api.interaction.*
 
 @Subscribe
-class IdeaCommand : HandyCommand() {
+class IdeaCommand : HandyCommand("idea") {
     override fun register(): SlashCommandBuilder =
-        builder("idea", "Suggest an idea for an addon or modpack")
+        builder(description = "Suggest an idea for an addon or modpack")
 //            .addOption(SlashCommandOption.create(SlashCommandOptionType.STRING, "content", "What's your idea?"))
             .addOption(SlashCommandOptionBuilder().setType(SlashCommandOptionType.STRING).setName("content").setDescription("What's your idea?").setRequired(true).build())
     override fun onCalled(ctx: SlashCommandInteraction) {

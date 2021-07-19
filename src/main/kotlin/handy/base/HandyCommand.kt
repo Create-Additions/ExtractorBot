@@ -3,14 +3,16 @@ package handy.base
 import handy.HandyDiscord.api
 import handy.data.HandyConfig
 import org.javacord.api.entity.message.MessageFlag
+import org.javacord.api.entity.server.Server
 import org.javacord.api.event.interaction.MessageComponentCreateEvent
 import org.javacord.api.event.interaction.SlashCommandCreateEvent
 import org.javacord.api.interaction.*
 import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder
+import java.util.*
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
-abstract class HandyCommand : Subscribable {
+abstract class HandyCommand(val id: String) : Subscribable {
     companion object {
         private var lastComponentId = 0
         private val components = hashMapOf<String, BiConsumer<MessageComponentCreateEvent, MessageComponentInteraction>>()
@@ -36,18 +38,27 @@ abstract class HandyCommand : Subscribable {
                 onCalled(slashCommandInteraction)
             }
         }
+        afterCommandRegistered()
     }
 
-    fun simpleCommand(name: String, description: String): SlashCommandBuilder? {
+    open fun afterCommandRegistered() {}
+
+    fun setCommandPermissions(server: Server, vararg p: SlashCommandPermissions) {
+        SlashCommandPermissionsUpdater(server).setPermissions(p.toMutableList()).update(command!!.id)
+    }
+
+    fun simpleCommand(name: String = id, description: String): SlashCommandBuilder? {
         return SlashCommand.with(name, description)
     }
 
     fun updateCommand(transform: Consumer<SlashCommandUpdater>): SlashCommand {
         val u = SlashCommandUpdater(command!!.id)
         transform.accept(u)
-        command = (if(HandyConfig.get().isDev) u.updateForServer(api!!.getServerById(HandyConfig.get().mainServer).get()) else u.updateGlobal(api!!)).join()
+        command = (if(HandyConfig.get().isDev) u.updateForServer(getServer()) else u.updateGlobal(api!!)).join()
         return command!!
     }
+
+    fun getServer() = api!!.getServerById(HandyConfig.get().mainServer).get()
 
     fun addComponentSubscriber(name: String = "", onPress: BiConsumer<MessageComponentCreateEvent, MessageComponentInteraction>): String {
         val id = name + lastComponentId++
@@ -70,7 +81,7 @@ abstract class HandyCommand : Subscribable {
 
     fun getNextComponentId() = lastComponentId++
 
-    fun builder(name: String, description: String) = SlashCommandBuilder().setName(name).setDescription(description)
+    fun builder(name: String = id, description: String) = SlashCommandBuilder().setName(name).setDescription(description)
 
     abstract fun register(): SlashCommandBuilder
     abstract fun onCalled(ctx: SlashCommandInteraction)
