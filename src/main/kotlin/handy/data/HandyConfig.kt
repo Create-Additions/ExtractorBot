@@ -8,10 +8,9 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class HandyConfig(val discordToken: String, var isDev: Boolean = true, var suggestionChannel: String = "",
-                       var mainServer: String = "", var applyChannel: String = "", var ideaRole: String = "",
-                       var coderRole: String = "", var artRole: String = "", var packRole: String = "",
-                       var devRole: String = "", var funnyButton: Boolean = true, var curseCheckInterval: Int = 120,
-                       var modReleasesChannel: String, var modReleasesCheckCount:Int = 10
+                       var mainServer: String = "", var ideaRole: String = "",
+                       var funnyButton: Boolean = true, var curseCheckInterval: Int = 1800,
+                       var modReleasesChannel: String, var modReleasesCheckCount:Int = 3
 ) {
     companion object {
         val file = HandyData.get("config.json")
