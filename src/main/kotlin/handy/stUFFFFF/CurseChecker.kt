@@ -55,6 +55,7 @@ class CurseChecker : Subscribable {
                 .setTitle("${file.project().name()} released a new file: ${file.displayName()}")
                 .setUrl(file.url().toString())
                 .addField("Changelog", changelog)
+                .setColor(mod.type.color)
             )
 //            .appendNewLine()
 //            .append("```")

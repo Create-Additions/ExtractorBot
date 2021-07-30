@@ -5,13 +5,12 @@ import com.therandomlabs.curseapi.file.CurseFile
 import com.therandomlabs.curseapi.file.CurseFiles
 import com.therandomlabs.curseapi.project.CurseProject
 import handy.Handy
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.awt.Color
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Serializable
 class HandyMods(val mods: ArrayList<Mod> = ArrayList()) {
@@ -48,16 +47,16 @@ class HandyMods(val mods: ArrayList<Mod> = ArrayList()) {
         return this
     }
 
-    enum class ModType(val getChannel: () -> String?) {
+    enum class ModType(val getChannel: () -> String?, val color: Color) {
         OFFICIAL ({
             HandyConfig.get().officialReleasesChannel
-        }),
+        }, Color.CYAN),
         MOD ({
             HandyConfig.get().modReleasesChannel
-        }),
+        }, Color.MAGENTA),
         PACK ({
             HandyConfig.get().packReleasesChannel
-        }),
-        UNFETCHED ({ null });
+        }, Color(111, 255, 111)),
+        UNFETCHED ({ null }, Color.BLACK);
     }
 }
