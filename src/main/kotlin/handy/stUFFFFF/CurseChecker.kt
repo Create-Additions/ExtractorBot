@@ -49,12 +49,7 @@ class CurseChecker : Subscribable {
                 "No changelog provided"
             }
             changelog.length > 330 -> {
-                val client = GitHubClient().setOAuth2Token(HandyConfig.get().ghToken)
-                var gist = Gist().setDescription("Changelog for ${file.nameOnDisk()}")
-                val gistFile = GistFile().setContent(changelog)
-                gist.files = mapOf("changelog-${file.id()}.md" to gistFile)
-                gist = GistService(client).createGist(gist)
-                "Changelog too long, press [here](${gist.htmlUrl}) to see it"
+                "Changelog too long, press [here](${file.url()}) to see it"
             }
             else -> changelog
         }
