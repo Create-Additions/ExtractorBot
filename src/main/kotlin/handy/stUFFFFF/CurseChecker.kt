@@ -1,23 +1,20 @@
 package handy.stUFFFFF
 
-import com.therandomlabs.curseapi.CurseAPI
-import com.therandomlabs.curseapi.CurseException
 import com.therandomlabs.curseapi.file.CurseFile
-import com.therandomlabs.curseapi.forgesvc.ForgeSvcProvider
 import handy.HandyDiscord.api
 import handy.base.Subscribable
 import handy.base.Subscribe
 import handy.data.HandyConfig
 import handy.data.HandyMods
+import org.eclipse.egit.github.core.Gist
+import org.eclipse.egit.github.core.GistFile
+import org.eclipse.egit.github.core.client.GitHubClient
+import org.eclipse.egit.github.core.service.GistService
 import org.javacord.api.entity.message.MessageBuilder
-import org.javacord.api.entity.message.component.ActionRow
-import org.javacord.api.entity.message.component.Button
 import org.javacord.api.entity.message.embed.EmbedBuilder
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.util.*
 import kotlin.concurrent.scheduleAtFixedRate
+
 
 @Subscribe
 class CurseChecker : Subscribable {
@@ -47,8 +44,19 @@ class CurseChecker : Subscribable {
             .setChannel(api!!.getChannelById(mod.getProjectType(project).getChannel()).get().asServerTextChannel().get())
             .update().get()
         var changelog = file.changelogPlainText()
-        if(changelog.isEmpty()) {
-            changelog = "No changelog provided"
+        changelog = when {
+            changelog.isEmpty() -> {
+                "No changelog provided"
+            }
+            changelog.length > 330 -> {
+                val client = GitHubClient().setOAuth2Token(HandyConfig.get().ghToken)
+                var gist = Gist().setDescription("Changelog for ${file.nameOnDisk()}")
+                val gistFile = GistFile().setContent(changelog)
+                gist.files = mapOf("changelog-${file.id()}.md" to gistFile)
+                gist = GistService(client).createGist(gist)
+                "Changelog too long, press [here](${gist.htmlUrl}) to see it"
+            }
+            else -> changelog
         }
         MessageBuilder()
             .addEmbed(EmbedBuilder()

@@ -12,7 +12,8 @@ data class HandyConfig(val discordToken: String = "TODO", var isDev: Boolean = t
                        var coderRole: String = "TODO", var artRole: String = "TODO", var packRole: String = "TODO",
                        var devRole: String = "TODO", var funnyButton: Boolean = true, var curseCheckInterval: Int = 60 * 60 * 60,
                        var modReleasesChannel: String = "TODO", var modReleasesCheckCount:Int = 4, var officialProjects: List<Int> = ArrayList(),
-                       var packReleasesChannel: String = "TODO", var officialReleasesChannel: String = "TODO", var releaseWebhook: String = "TODO"
+                       var packReleasesChannel: String = "TODO", var officialReleasesChannel: String = "TODO", var releaseWebhook: String = "TODO",
+                       var ghToken: String = "TODO"
 ) {
     companion object {
         val file = HandyData.get("config.json")
