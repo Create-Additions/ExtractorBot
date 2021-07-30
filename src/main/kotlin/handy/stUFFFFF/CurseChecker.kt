@@ -1,7 +1,9 @@
 package handy.stUFFFFF
 
+import com.therandomlabs.curseapi.CurseAPI
 import com.therandomlabs.curseapi.CurseException
 import com.therandomlabs.curseapi.file.CurseFile
+import com.therandomlabs.curseapi.forgesvc.ForgeSvcProvider
 import handy.HandyDiscord.api
 import handy.base.Subscribable
 import handy.base.Subscribe
@@ -37,23 +39,38 @@ class CurseChecker : Subscribable {
     }
 
     fun sendNewFileMessage(mod: HandyMods.Mod, file: CurseFile) {
+        var webhook = api!!.getWebhookById(HandyConfig.get().releaseWebhook.toLong()).get()
+        val project = file.project();
+        webhook = webhook.createUpdater()
+            .setAvatar(project.logo().url().url())
+            .setName(project.name())
+            .setChannel(api!!.getChannelById(mod.getProjectType(project).getChannel()).get().asServerTextChannel().get())
+            .update().get()
+        var changelog = file.changelogPlainText()
+        if(changelog.isEmpty()) {
+            changelog = "No changelog provided"
+        }
         MessageBuilder()
-            .append("${file.project().name()} released a new file: ${file.displayName()}")
-            .appendNewLine()
-            .append("```")
-            .append {
-                val text = file.changelogPlainText()
-                if(text.isEmpty()) {
-                    return@append "No changelog provided"
-                }
-                return@append text
-            }
-            .append("```")
-            .addActionRow(
-                Button.link(file.url().toString(), "File"),
-                Button.link(file.downloadURL().toString(), "Download"),
-                Button.link(file.project().url().toString(), file.project().name())
+            .addEmbed(EmbedBuilder()
+                .setTitle("${file.project().name()} released a new file: ${file.displayName()}")
+                .setUrl(file.url().toString())
+                .addField("Changelog", changelog)
             )
-            .send(api!!.getChannelById(HandyConfig.get().modReleasesChannel).get().asTextChannel().get())
+//            .appendNewLine()
+//            .append("```")
+//            .append {
+//                val text = file.changelogPlainText()
+//                if(text.isEmpty()) {
+//                    return@append "No changelog provided"
+//                }
+//                return@append text
+//            }
+//            .append("```")
+//            .addActionRow(
+//                Button.link(file.url().toString(), "File"),
+//                Button.link(file.downloadURL().toString(), "Download"),
+//                Button.link(file.project().url().toString(), file.project().name())
+//            )
+            .send(webhook.asIncomingWebhook().get()).get().crossPost()
     }
 }
