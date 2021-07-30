@@ -7,12 +7,12 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class HandyConfig(val discordToken: String, var isDev: Boolean = true, var suggestionChannel: String = "",
-                       var mainServer: String = "", var applyChannel: String = "", var ideaRole: String = "",
-                       var coderRole: String = "", var artRole: String = "", var packRole: String = "",
-                       var devRole: String = "", var funnyButton: Boolean = true, var curseCheckInterval: Int = 120,
-                       var modReleasesChannel: String, var modReleasesCheckCount:Int = 10, var officialProjects: List<String>,
-                       var packReleasesChannel: String, var officialReleasesChannel: String, var releaseWebhook: String
+data class HandyConfig(val discordToken: String = "TODO", var isDev: Boolean = true, var suggestionChannel: String = "TODO",
+                       var mainServer: String = "TODO", var applyChannel: String = "TODO", var ideaRole: String = "TODO",
+                       var coderRole: String = "TODO", var artRole: String = "TODO", var packRole: String = "TODO",
+                       var devRole: String = "TODO", var funnyButton: Boolean = true, var curseCheckInterval: Int = 60 * 60 * 60,
+                       var modReleasesChannel: String = "TODO", var modReleasesCheckCount:Int = 4, var officialProjects: List<String> = ArrayList(),
+                       var packReleasesChannel: String = "TODO", var officialReleasesChannel: String = "TODO", var releaseWebhook: String = "TODO"
 ) {
     companion object {
         val file = HandyData.get("config.json")
