@@ -4,6 +4,7 @@ import handy.HandyDiscord.api
 import handy.base.HandyCommand
 import handy.base.RawCommand
 import handy.base.SubscribeInitable
+import handy.data.HandyConfig
 import handy.data.HandyQuotes
 import org.javacord.api.entity.channel.ServerTextChannel
 import org.javacord.api.entity.message.Message
@@ -15,7 +16,9 @@ import org.javacord.api.interaction.*
 class QuoteCommand : RawCommand("quote") {
     init {
         instance = this
-        SlashCommand().init()
+        if(quotesEnabled()) {
+            SlashCommand().init()
+        }
     }
 
     companion object {
@@ -36,6 +39,9 @@ class QuoteCommand : RawCommand("quote") {
 //                    .addOption(SlashCommandOptionBuilder().setType(SlashCommandOptionType.STRING).setName("message").setDescription(f.capitalize()).setRequired(false).build())
 
             override fun onCalled(ctx: SlashCommandInteraction) {
+                if(!instance!!.quotesEnabled()) { // not sure how this can happen but just in case
+                    return
+                }
                 val result = instance!!.commonRun(
                     ctx.getOptionByName("message").orElseGet { null }?.stringValue?.orElseGet { null },
                     null,
@@ -66,7 +72,9 @@ class QuoteCommand : RawCommand("quote") {
 //
 //        }
 //    }
-    override fun checkForPermissions(event: MessageCreateEvent) = isOnServer(event)
+    fun quotesEnabled(): Boolean = HandyConfig.get().quotesEnabled
+
+    override fun checkForPermissions(event: MessageCreateEvent) = quotesEnabled() && isOnServer(event)
 
     private fun errPair(message: String): Pair<String, Boolean> {
         return Pair(message, false)
