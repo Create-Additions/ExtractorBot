@@ -6,6 +6,10 @@ import handy.base.Initable
 import handy.base.SubscribeInitable
 import handy.data.HandyConfig
 import handy.data.HandyMods
+import org.eclipse.egit.github.core.Gist
+import org.eclipse.egit.github.core.GistFile
+import org.eclipse.egit.github.core.client.GitHubClient
+import org.eclipse.egit.github.core.service.GistService
 import org.javacord.api.entity.message.MessageBuilder
 import org.javacord.api.entity.message.embed.EmbedBuilder
 import java.util.*
@@ -44,8 +48,13 @@ class CurseChecker : Initable {
             changelog.isEmpty() -> {
                 "No changelog provided"
             }
-            changelog.length > 330 -> {
-                "Changelog too long, press [here](${file.url()}) to see it"
+            changelog.length > 330 || changelog.split("\n").size > 7 -> {
+                val client = GitHubClient().setOAuth2Token(HandyConfig.get().ghToken)
+                var gist = Gist().setDescription("Changelog for ${file.nameOnDisk()}")
+                val gistFile = GistFile().setContent(changelog)
+                gist.files = mapOf("changelog-${file.id()}.md" to gistFile)
+                gist = GistService(client).createGist(gist)
+                "Changelog too long, press [here](${gist.htmlUrl}) to see it"
             }
             else -> changelog
         }
