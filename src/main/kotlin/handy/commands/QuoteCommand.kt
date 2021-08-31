@@ -2,23 +2,20 @@ package handy.commands
 
 import handy.HandyDiscord.api
 import handy.base.HandyCommand
-import handy.base.LazyValue
 import handy.base.RawCommand
-import handy.base.Subscribe
+import handy.base.SubscribeInitable
 import handy.data.HandyQuotes
-import org.javacord.api.entity.channel.Channel
 import org.javacord.api.entity.channel.ServerTextChannel
 import org.javacord.api.entity.message.Message
-import org.javacord.api.entity.server.Server
 import org.javacord.api.entity.user.User
 import org.javacord.api.event.message.MessageCreateEvent
 import org.javacord.api.interaction.*
 
-@Subscribe
+@SubscribeInitable
 class QuoteCommand : RawCommand("quote") {
     init {
         instance = this
-        SlashCommand().subscribe()
+        SlashCommand().init()
     }
 
     companion object {

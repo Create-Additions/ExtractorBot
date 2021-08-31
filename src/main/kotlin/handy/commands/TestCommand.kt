@@ -1,11 +1,11 @@
 package handy.commands
 
 import handy.base.HandyCommand
-import handy.base.Subscribe
+import handy.base.SubscribeInitable
 import org.javacord.api.entity.message.MessageFlag
 import org.javacord.api.interaction.SlashCommandInteraction
 
-@Subscribe
+@SubscribeInitable
 class TestCommand : HandyCommand("test") {
     override fun register() = simpleCommand(description =  "Test the bot")!!.setDefaultPermission(true)!!
 

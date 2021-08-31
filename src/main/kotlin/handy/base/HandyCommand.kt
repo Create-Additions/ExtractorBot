@@ -8,12 +8,10 @@ import org.javacord.api.event.interaction.MessageComponentCreateEvent
 import org.javacord.api.event.interaction.SlashCommandCreateEvent
 import org.javacord.api.interaction.*
 import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder
-import java.util.*
 import java.util.function.BiConsumer
 import java.util.function.Consumer
-import java.util.function.UnaryOperator
 
-abstract class HandyCommand(val id: String) : Subscribable {
+abstract class HandyCommand(val id: String) : Initable {
     companion object {
         private var lastComponentId = 0
         private val components = hashMapOf<String, BiConsumer<MessageComponentCreateEvent, MessageComponentInteraction>>()
@@ -30,7 +28,7 @@ abstract class HandyCommand(val id: String) : Subscribable {
 
     var command: SlashCommand? = null
 
-    override fun subscribe() {
+    override fun init() {
         val b = register()
         command = ((if (HandyConfig.get().isDev) b.createForServer(api!!.getServerById(HandyConfig.get().mainServer).get()) else b.createGlobal(api))).join()
         api!!.addSlashCommandCreateListener { event: SlashCommandCreateEvent ->

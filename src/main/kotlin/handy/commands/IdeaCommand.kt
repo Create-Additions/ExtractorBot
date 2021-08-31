@@ -2,12 +2,12 @@ package handy.commands
 
 import handy.base.HandyCommand
 import handy.HandyDiscord.api
-import handy.base.Subscribe
+import handy.base.SubscribeInitable
 import handy.data.HandyConfig
 import org.javacord.api.entity.message.MessageBuilder
 import org.javacord.api.interaction.*
 
-@Subscribe
+@SubscribeInitable
 class IdeaCommand : HandyCommand("idea") {
     override fun register(): SlashCommandBuilder =
         builder(description = "Suggest an idea for an addon or modpack")
@@ -22,8 +22,8 @@ class IdeaCommand : HandyCommand("idea") {
         simpleUserOnlyResponse(ctx, "Idea suggested")
     }
 
-    override fun subscribe() {
-        super.subscribe()
+    override fun init() {
+        super.init()
         api!!.addMessageCreateListener {
             val ideaId = HandyConfig.get().ideaRole
             if(it.channel.idAsString == HandyConfig.get().suggestionChannel && it.message.mentionedRoles.any { r -> r.id.toString() == ideaId}) {

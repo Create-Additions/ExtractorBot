@@ -3,7 +3,7 @@ package handy.commands
 import com.therandomlabs.curseapi.CurseAPI
 import com.therandomlabs.curseapi.project.CurseProject
 import handy.base.AdminCommand
-import handy.base.Subscribe
+import handy.base.SubscribeInitable
 import handy.data.HandyMods
 import okhttp3.HttpUrl
 import org.javacord.api.interaction.*
@@ -11,7 +11,7 @@ import org.javacord.api.interaction.SlashCommandOption.*
 import org.javacord.api.interaction.SlashCommandOptionType.*
 import java.util.*
 
-@Subscribe
+@SubscribeInitable
 class CurseCommand : AdminCommand("curse") {
     override fun createCommand(): SlashCommandBuilder {
         return SlashCommandBuilder().setName(id).setDescription("Add or remove notifications from CurseForge project")

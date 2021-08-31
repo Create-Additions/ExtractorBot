@@ -1,14 +1,11 @@
 package handy.commands
 
 import handy.base.AdminCommand
-import handy.base.HandyCommand
-import handy.base.Subscribe
+import handy.base.SubscribeInitable
 import handy.data.HandyPronouns
-import org.javacord.api.entity.permission.PermissionState
-import org.javacord.api.entity.permission.PermissionType
 import org.javacord.api.interaction.*
 
-@Subscribe
+@SubscribeInitable
 class PronounsListCommand : AdminCommand("pronouns_list") {
     override fun createCommand(): SlashCommandBuilder {
         return builder(description = "test")

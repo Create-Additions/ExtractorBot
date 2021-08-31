@@ -2,23 +2,19 @@ package handy.stUFFFFF
 
 import com.therandomlabs.curseapi.file.CurseFile
 import handy.HandyDiscord.api
-import handy.base.Subscribable
-import handy.base.Subscribe
+import handy.base.Initable
+import handy.base.SubscribeInitable
 import handy.data.HandyConfig
 import handy.data.HandyMods
-import org.eclipse.egit.github.core.Gist
-import org.eclipse.egit.github.core.GistFile
-import org.eclipse.egit.github.core.client.GitHubClient
-import org.eclipse.egit.github.core.service.GistService
 import org.javacord.api.entity.message.MessageBuilder
 import org.javacord.api.entity.message.embed.EmbedBuilder
 import java.util.*
 import kotlin.concurrent.scheduleAtFixedRate
 
 
-@Subscribe
-class CurseChecker : Subscribable {
-    override fun subscribe() {
+@SubscribeInitable
+class CurseChecker : Initable {
+    override fun init() {
         Timer().scheduleAtFixedRate(10, HandyConfig.get().curseCheckInterval * 1000L) {
             HandyMods.get().mods.forEach { mod ->
                 val files = mod.getFiles().get()

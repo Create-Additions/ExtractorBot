@@ -1,7 +1,7 @@
 package handy.commands
 
 import handy.base.HandyCommand
-import handy.base.Subscribe
+import handy.base.SubscribeInitable
 import handy.data.HandyConfig
 import org.javacord.api.entity.message.Message
 import org.javacord.api.entity.message.MessageFlag
@@ -14,7 +14,7 @@ import org.javacord.api.entity.server.Server
 import org.javacord.api.entity.user.User
 import org.javacord.api.interaction.*
 
-@Subscribe
+@SubscribeInitable
 class HahaFunnyButtonCommand : HandyCommand("haha") {
     fun getText(user: String, times: String, isOff: Boolean): String {
         var s = "Clicked $times times, last clicked by $user"

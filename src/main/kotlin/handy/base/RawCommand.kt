@@ -4,10 +4,10 @@ import handy.HandyDiscord.api
 import handy.data.HandyConfig
 import org.javacord.api.event.message.MessageCreateEvent
 
-abstract class RawCommand(val id: String, var prefix: String = HandyConfig.get().prefix) : Subscribable {
+abstract class RawCommand(val id: String, var prefix: String = HandyConfig.get().prefix) : Initable {
     open fun getTriggers() = listOf(prefix + id)
 
-    override fun subscribe() {
+    override fun init() {
         this.getTriggers().forEach { commands[it] = this }
     }
 
@@ -24,11 +24,11 @@ abstract class RawCommand(val id: String, var prefix: String = HandyConfig.get()
 
     abstract fun run(event: MessageCreateEvent)
 
-    @Subscribe
-    companion object : Subscribable {
+    @SubscribeInitable
+    companion object : Initable {
         val commands = mutableMapOf<String, RawCommand>()
 
-        override fun subscribe() {
+        override fun init() {
             api!!.addMessageCreateListener {
                 val content = it.messageContent
                 val c = commands.keys.firstOrNull { key -> content.startsWith(key) }

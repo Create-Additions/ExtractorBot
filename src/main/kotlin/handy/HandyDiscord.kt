@@ -10,7 +10,7 @@ object HandyDiscord {
 
     fun create() {
         api = DiscordApiBuilder().setToken(HandyConfig.get().discordToken).setAllIntents().login().join()
-        HandySubscriptions.findAndSubscribe()
+        HandyInitables.findAndInit()
         HandyCommand.registerComponentSubscriber()
     }
 }

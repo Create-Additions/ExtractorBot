@@ -1,7 +1,7 @@
 package handy.commands
 
 import handy.base.HandyCommand
-import handy.base.Subscribe
+import handy.base.SubscribeInitable
 import handy.data.HandyConfig
 import org.javacord.api.entity.message.Message
 import org.javacord.api.entity.message.MessageBuilder
@@ -11,7 +11,7 @@ import org.javacord.api.entity.message.component.Button
 import org.javacord.api.event.interaction.MessageComponentCreateEvent
 import org.javacord.api.interaction.*
 
-@Subscribe
+@SubscribeInitable
 class ApplyCommand : HandyCommand("apply") {
     enum class ApplicationType(val description: String) {
         MOD("Apply with your mod"),
