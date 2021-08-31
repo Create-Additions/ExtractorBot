@@ -11,7 +11,10 @@ import org.eclipse.egit.github.core.GistFile
 import org.eclipse.egit.github.core.client.GitHubClient
 import org.eclipse.egit.github.core.service.GistService
 import org.javacord.api.entity.message.MessageBuilder
+import org.javacord.api.entity.message.component.Button
+import org.javacord.api.entity.message.component.LowLevelComponent
 import org.javacord.api.entity.message.embed.EmbedBuilder
+import org.javacord.api.entity.webhook.Webhook
 import java.util.*
 import kotlin.concurrent.scheduleAtFixedRate
 
@@ -35,15 +38,38 @@ class CurseChecker : Initable {
         }
     }
 
-    fun sendNewFileMessage(mod: HandyMods.Mod, file: CurseFile) {
-        var webhook = api!!.getWebhookById(HandyConfig.get().releaseWebhook.toLong()).get()
+//    fun getOrCreateWebhook(): Webhook {
+//        val id = HandyConfig.get().releaseWebhook
+//        // if id contains non numerical characters
+//        if(!id.contains(Regex("\\d"))) {
+//            val w = api!!.getServerById(HandyConfig.get().mainServer).get()
+//                .getTextChannelById(HandyConfig.get().modReleasesChannel).get().createWebhookBuilder()
+//                .setName("Release webhook").create().get()
+//            HandyConfig.get().releaseWebhook = w.idAsString
+//            HandyConfig.get().save()
+//            return w
+//        }
+//        return api!!.getWebhookById(id.toLong()).get()
+//    }
+
+    fun createWebhook(mod: HandyMods.Mod, file: CurseFile): Webhook {
         val project = file.project();
-        webhook = webhook.createUpdater()
+        return api!!.getServerTextChannelById(mod.getProjectType(project).getChannel()).get().createWebhookBuilder()
             .setAvatar(project.logo().url().url())
             .setName(project.name())
-            .setChannel(api!!.getChannelById(mod.getProjectType(project).getChannel()).get().asServerTextChannel().get())
-            .update().get()
+//            .setChannel(api!!.getChannelById(mod.getProjectType(project).getChannel()).get().asServerTextChannel().get())
+            .create().get()
+    }
+
+    fun sendNewFileMessage(mod: HandyMods.Mod, file: CurseFile) {
+        val webhook = createWebhook(mod, file)
         var changelog = file.changelogPlainText()
+        val components = LinkedList(arrayListOf(
+            Button.link(file.url().toString(), "File"),
+            Button.link(file.downloadURL().toString(), "Download"),
+            Button.link(file.project().url().toString(), file.project().name()))
+        )
+        var changelogButton = Button.link(file.url().toString(), "Changelog")
         changelog = when {
             changelog.isEmpty() -> {
                 "No changelog provided"
@@ -54,10 +80,12 @@ class CurseChecker : Initable {
                 val gistFile = GistFile().setContent(changelog)
                 gist.files = mapOf("changelog-${file.id()}.md" to gistFile)
                 gist = GistService(client).createGist(gist)
+                changelogButton = Button.link(gist.htmlUrl, "Changelog")
                 "Changelog too long, press [here](${gist.htmlUrl}) to see it"
             }
             else -> changelog
         }
+        components.push(changelogButton)
         MessageBuilder()
             .addEmbed(EmbedBuilder()
                 .setTitle("${file.project().name()} released a new file: ${file.displayName()}")
@@ -75,11 +103,8 @@ class CurseChecker : Initable {
 //                return@append text
 //            }
 //            .append("```")
-//            .addActionRow(
-//                Button.link(file.url().toString(), "File"),
-//                Button.link(file.downloadURL().toString(), "Download"),
-//                Button.link(file.project().url().toString(), file.project().name())
-//            )
-            .send(webhook.asIncomingWebhook().get()).get().crossPost()
+            .addActionRow(*components.toTypedArray())
+            .send(webhook.asIncomingWebhook().get()).get().crossPost().get()
+        webhook.delete("Update message sent.")
     }
 }
