@@ -37,7 +37,7 @@ class QuoteCommand : RawCommand("quote") {
 
             override fun onCalled(ctx: SlashCommandInteraction) {
                 val result = instance!!.commonRun(
-                    ctx.getOptionByName("message").orElseGet { null }.stringValue.orElseGet { null },
+                    ctx.getOptionByName("message").orElseGet { null }?.stringValue?.orElseGet { null },
                     null,
                     ctx.channel.get().asServerTextChannel().orElseGet { null },
                     ctx.user)
