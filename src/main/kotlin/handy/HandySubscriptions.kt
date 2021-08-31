@@ -11,7 +11,8 @@ object HandySubscriptions {
     fun findAndSubscribe() {
         subscribables = Reflections("handy").getTypesAnnotatedWith(Subscribe::class.java)
         subscribables.forEach {
-            val i = it.getConstructor().newInstance()
+            println("Running subrscribable ${it.name}")
+            val i = it.kotlin.objectInstance ?: it.getConstructor().newInstance()
             if(i is Subscribable) {
                 i.subscribe()
             } else {

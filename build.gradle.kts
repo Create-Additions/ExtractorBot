@@ -24,6 +24,7 @@ dependencies {
     api("com.github.TheRandomLabs:CurseAPI:master-SNAPSHOT")
     runtimeOnly("com.google.code.gson:gson:2.8.7")
     implementation("org.eclipse.mylyn.github:org.eclipse.egit.github.core:5.9.0.202009080501-r")
+    implementation(kotlin("reflect"))
 }
 
 tasks.test {
