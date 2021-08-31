@@ -11,17 +11,23 @@ import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
-abstract class HandyCommand(val id: String) : Initable {
-    companion object {
+abstract class HandyCommand(val id: String) : Initable{
+    @SubscribeInitable
+    companion object : Initable {
         private var lastComponentId = 0
         private val components = hashMapOf<String, BiConsumer<MessageComponentCreateEvent, MessageComponentInteraction>>()
+        private val commands = hashMapOf<String, HandyCommand>()
 
-        fun registerComponentSubscriber() {
+        override fun init() {
             api!!.addMessageComponentCreateListener {
                 val interaction = it.messageComponentInteraction
                 if(components.containsKey(interaction.customId)) {
                     components[interaction.customId]!!.accept(it, interaction)
                 }
+            }
+            api!!.addSlashCommandCreateListener { event: SlashCommandCreateEvent ->
+                val slashCommandInteraction = event.slashCommandInteraction
+                commands.getOrDefault(slashCommandInteraction.commandName, null)?.onCalled(slashCommandInteraction)
             }
         }
     }
@@ -31,12 +37,7 @@ abstract class HandyCommand(val id: String) : Initable {
     override fun init() {
         val b = register()
         command = ((if (HandyConfig.get().isDev) b.createForServer(api!!.getServerById(HandyConfig.get().mainServer).get()) else b.createGlobal(api))).join()
-        api!!.addSlashCommandCreateListener { event: SlashCommandCreateEvent ->
-            val slashCommandInteraction = event.slashCommandInteraction
-            if (slashCommandInteraction.commandName == command!!.name) {
-                onCalled(slashCommandInteraction)
-            }
-        }
+        commands[command!!.name] = this
         afterCommandRegistered()
     }
 
