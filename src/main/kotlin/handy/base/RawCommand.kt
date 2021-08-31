@@ -5,7 +5,7 @@ import handy.data.HandyConfig
 import org.javacord.api.event.message.MessageCreateEvent
 
 abstract class RawCommand(val id: String, var prefix: String = HandyConfig.get().prefix) : Initable {
-    open fun getTriggers() = listOf(prefix + id)
+    open fun getTriggers() = mutableListOf(prefix + id)
 
     override fun init() {
         this.getTriggers().forEach { commands[it] = this }

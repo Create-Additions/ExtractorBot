@@ -25,6 +25,10 @@ dependencies {
     runtimeOnly("com.google.code.gson:gson:2.8.7")
     implementation("org.eclipse.mylyn.github:org.eclipse.egit.github.core:5.9.0.202009080501-r")
     implementation(kotlin("reflect"))
+    implementation("io.ktor:ktor-client-core:1.6.3")
+    implementation("io.ktor:ktor-client-cio:1.6.3")
+    implementation("io.ktor:ktor-client-gson:1.6.3")
+    implementation("io.ktor:ktor-client-mock:1.6.3")
 }
 
 tasks.test {

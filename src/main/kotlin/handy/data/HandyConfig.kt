@@ -14,7 +14,7 @@ data class HandyConfig(val discordToken: String = "TODO", var isDev: Boolean = t
                        var modReleasesChannel: String = "TODO", var modReleasesCheckCount:Int = 4, var officialProjects: List<Int> = ArrayList(),
                        var packReleasesChannel: String = "TODO", var officialReleasesChannel: String = "TODO",
                        var ghToken: String = "TODO", var prefix: String = "!", var quoteChannel: String = "TODO",
-                       var quotesEnabled: Boolean = true
+                       var quotesEnabled: Boolean = true, var compileEnabled: Boolean = true
 ) {
     companion object {
         val file = HandyData.get("config.json")
