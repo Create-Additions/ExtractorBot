@@ -14,7 +14,7 @@ object HandyInitables {
     fun findAndInit() {
         initables = Reflections("handy").getTypesAnnotatedWith(SubscribeInitable::class.java)
         initables.forEach {
-            println("Running subrscribable ${it.name}")
+            println("Running initable ${it.name}")
             val i = it.kotlin.objectInstance ?: it.getConstructor().newInstance()
             if(i is Initable) {
                 i.init()
