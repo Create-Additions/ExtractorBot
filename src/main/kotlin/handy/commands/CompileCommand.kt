@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import org.javacord.api.event.message.MessageCreateEvent
+import kotlin.text.RegexOption.DOT_MATCHES_ALL
 
 
 @SubscribeInitable
@@ -64,10 +65,10 @@ class CompileCommand : RawCommand("compile") {
             return addAlias(Language(name), *alias)
         }
 
-        class JavaLanguage : Language("openjdk") {
+        object JavaLanguage : Language("openjdk") {
             override suspend fun run(event: MessageCreateEvent, code: String): WandboxResponse {
                 var codeV = code
-                if(code.lines().none { it.contains(Regex("class (.)*\\{")) }) {
+                if(code.lines().none { it.contains(Regex("class (.)*\\{", DOT_MATCHES_ALL)) }) {
                     codeV = "class HandyIsVeryCoolAndEpic {\n" +
                             "  public static void main(String[] args) {\n" +
                             "      $code;\n" +
@@ -78,10 +79,17 @@ class CompileCommand : RawCommand("compile") {
             }
         }
 
+        object FloppaLanguage : Language("floppa") {
+            override suspend fun run(event: MessageCreateEvent, code: String): WandboxResponse {
+                return WandboxResponse("floppers!","Floppers!", "Hello Floppa!", 1, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+            }
+        }
+
         val node = lang("nodejs", "node", "nodejs", "js", "javascript")
-        val openjdk = addAlias(JavaLanguage(), "java", "openjdk", "jdk", "jar", "jre")
+        val openjdk = addAlias(JavaLanguage, "java", "openjdk", "jdk", "jar", "jre")
         val openjdkRaw = lang("openjdk", "javaraw", "openjdkraw")
         val python = lang("cpython", "py", "py3", "python", "python3")
+        val floppa = addAlias(FloppaLanguage, "floppa", "flop", "floppers")
 //        val languages = mapOf(
 //            "node" to node,
 //            "nodejs" to node,
