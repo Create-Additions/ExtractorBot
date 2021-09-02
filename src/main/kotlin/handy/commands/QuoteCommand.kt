@@ -55,7 +55,7 @@ class QuoteCommand : RawCommand("quote") {
                     ctx.getOptionByName("message").orElseGet { null }?.stringValue?.orElseGet { null },
                     null,
                     ctx.channel.get().asServerTextChannel().orElseGet { null },
-                    ctx.user)
+                    ctx.user, 1)
                 if(result.second) simpleResponse(ctx, result.first)
                 else simpleUserOnlyResponse(ctx, result.first)
             }
@@ -89,7 +89,7 @@ class QuoteCommand : RawCommand("quote") {
         return Pair(message, false)
     }
 
-    fun commonRun(providedMessage: String?, referencedMessage: Message?, channel: ServerTextChannel?, user: User): Pair<String, Boolean> {
+    fun commonRun(providedMessage: String?, referencedMessage: Message?, channel: ServerTextChannel?, user: User, lastMessage: Int): Pair<String, Boolean> {
         var m: Message? = null
         if(providedMessage != null) {
             if("discord.com/channels/" in providedMessage) {
@@ -100,7 +100,7 @@ class QuoteCommand : RawCommand("quote") {
             m = referencedMessage
         }
         if(channel != null && providedMessage == null) {
-            m = channel.getMessages(2).get().first()
+            m = channel.getMessages(lastMessage).get().first()
         }
         if(m == null || m.channel?.canSee(user) == false) {
             return errPair("Could not find message! " +
@@ -121,6 +121,6 @@ class QuoteCommand : RawCommand("quote") {
             event.messageContent.split(" ").getOrNull(1),
             event.message.referencedMessage.orElseGet { null },
             event.channel.asServerTextChannel().orElseGet { null },
-            event.messageAuthor.asUser().get()).first)
+            event.messageAuthor.asUser().get(), 2).first)
     }
 }
