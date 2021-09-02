@@ -180,14 +180,13 @@ class CompileCommand : RawCommand("compile") {
         var urlToFetch: String? = null
         val attachments = event.messageAttachments
         var url = try {
-            URL(event.readableMessageContent.split(" ")[2]) // readable so that we can ignore < and > which are used to hide attachements
+            URL(args[1].removePrefix("<").removeSuffix(">"))
         } catch (e: Exception) {
             null
         }
         if(attachments.isNotEmpty()) {
             urlToFetch = attachments[0].url.toString()
         } else if(url != null) {
-            print(url.host)
             if(url.host == "github.com") {
                 url = url.replaceHost("raw.githubusercontent.com").replaceFile(url.file.replace("/blob", ""))
             }
