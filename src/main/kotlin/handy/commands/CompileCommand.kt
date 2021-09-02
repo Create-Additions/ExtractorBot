@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import org.javacord.api.event.message.MessageCreateEvent
+import java.io.File
 import kotlin.text.RegexOption.DOT_MATCHES_ALL
 
 
@@ -22,14 +23,17 @@ class CompileCommand : RawCommand("compile") {
         return ArrayList(super.getTriggers() + listOf("${prefix}run", "${prefix}eval", "${prefix}do"))
     }
     companion object {
-        open class Language(val name: String) {
+        val compilePath = "https://wandbox.org/api/compile.json"
+
+        open class Language(val name: String, val version: String = "head") {
+            var compiler: String = "$name-$version"
             open suspend fun run(event: MessageCreateEvent, code: String): WandboxResponse {
                 val client = HttpClient(CIO) {
                     install(JsonFeature)
                 }
-                return client.post("https://wandbox.org/api/compile.json") {
+                return client.post(compilePath) {
                     contentType(ContentType.Application.Json)
-                    body = WandboxRequest("$name-head", code)
+                    body = WandboxRequest(compiler, code)
                 }
             }
         }
@@ -49,6 +53,10 @@ class CompileCommand : RawCommand("compile") {
             fun urlNoEmbed(): String? {
                 if(url == null) return null
                 return "<${url}>"
+            }
+
+            companion object {
+                fun message(message: String) = WandboxResponse(null, message, message, 1, null)
             }
         }
 
@@ -80,8 +88,45 @@ class CompileCommand : RawCommand("compile") {
         }
 
         object FloppaLanguage : Language("floppa") {
+            val floppaTemplate = LazyValue {
+                // npe my beloved
+                return@LazyValue File(ClassLoader.getSystemResource("floppa.go").file).readText()
+            }
+
+            val goVersion = "1.14.2"
+
+            fun floppaCode(code: String): String {
+                return floppaTemplate.get().replace("%CODE%", code)
+            }
+
+            suspend fun floppaToGo(client: HttpClient, code: String): String? {
+                val response: WandboxResponse = client.post(compilePath) {
+                    contentType(ContentType.Application.Json)
+                    body = WandboxRequest("go-$goVersion", floppaCode(code), save = false)
+                }
+
+                val responseOutput = response.toString()
+                if(responseOutput.lines()[0] == "CODE: ") {
+                    return response.toString().replaceFirst("CODE: \n", "")
+                        .replaceFirst("byte(a %!)(MISSING)", "byte(a % 255)")
+                        .replaceFirst("byte(256 - (a %!)(MISSING))", "byte(256 - (a % 255))")
+                }
+                return null
+            }
+
             override suspend fun run(event: MessageCreateEvent, code: String): WandboxResponse {
-                return WandboxResponse("floppers!","Floppers!", "Hello Floppa!", 1, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                val client = HttpClient(CIO) {
+                    install(JsonFeature)
+                }
+                var goCode = floppaToGo(client, code)
+                if(goCode != null) {
+                    return client.post(compilePath) {
+                        contentType(ContentType.Application.Json)
+                        body = WandboxRequest("go-$goVersion", goCode)
+                    }
+                }
+                return WandboxResponse.message("Could not parse code!")
+//                return WandboxResponse("floppers!","Floppers!", "Hello Floppa!", 1, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
             }
         }
 
