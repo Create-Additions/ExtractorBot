@@ -16,6 +16,7 @@ import org.javacord.api.event.message.MessageCreateEvent
 import java.io.File
 import java.lang.Exception
 import java.net.URL
+import java.nio.channels.UnresolvedAddressException
 import kotlin.text.RegexOption.DOT_MATCHES_ALL
 
 
@@ -206,7 +207,12 @@ class CompileCommand : RawCommand("compile") {
         runBlocking {
             launch {
                 if(urlToFetch != null && code == null) {
-                    code = HttpClient(CIO).get(urlToFetch)
+                    try {
+                        code = HttpClient(CIO).get(urlToFetch)
+                    } catch (e: UnresolvedAddressException) {
+                        event.message.reply("Unresolved address")
+                        return@launch
+                    }
                 }
                 val out = lang.run(event, code ?: "")
                 var outString = out.toString().replace("`", "\\`")
