@@ -7,7 +7,11 @@ import org.javacord.api.interaction.SlashCommandInteraction
 
 @SubscribeInitable
 class TestCommand : HandyCommand("test") {
-    override fun register() = simpleCommand(description =  "Test the bot")!!.setDefaultPermission(true)!!
+    override fun register() = command(description = "Test the bot") {
+        permissions {
+            default = true
+        }
+    }
 
     override fun onCalled(ctx: SlashCommandInteraction) {
         ctx.createImmediateResponder()

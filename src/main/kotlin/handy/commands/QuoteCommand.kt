@@ -11,6 +11,7 @@ import org.javacord.api.entity.message.Message
 import org.javacord.api.entity.user.User
 import org.javacord.api.event.message.MessageCreateEvent
 import org.javacord.api.interaction.*
+import org.javacord.api.interaction.SlashCommandOptionType.STRING
 
 @SubscribeInitable
 class QuoteCommand : RawCommand("quote") {
@@ -25,13 +26,21 @@ class QuoteCommand : RawCommand("quote") {
         var instance: QuoteCommand? = null
 
         class SlashCommand : HandyCommand("quote") {
-            override fun register(): SlashCommandBuilder =
-                builder(description = "Quote a message" +
+            override fun register() =
+                command(description = "Quote a message" +
                         ", note: using ${instance!!.prefix + instance!!.id} also allows replying to the " +
-                        "message you want to quote")
-                    .addOption(SlashCommandOptionBuilder().setType(SlashCommandOptionType.STRING).setName("message")
-                        .setDescription("Link to the message, " +
-                            "if not provided the last message sent in the channel is quoted").setRequired(false).build())
+                        "message you want to quote") {
+                    option("message", "Link to the message, " +
+                            "if not provided the last message sent in the channel is quoted", STRING) {
+                        required = false
+                    }
+                }
+//                builder(description = "Quote a message" +
+//                        ", note: using ${instance!!.prefix + instance!!.id} also allows replying to the " +
+//                        "message you want to quote")
+//                    .addOption(SlashCommandOptionBuilder().setType(SlashCommandOptionType.STRING).setName("message")
+//                        .setDescription("Link to the message, " +
+//                            "if not provided the last message sent in the channel is quoted").setRequired(false).build())
 //            override fun register(): SlashCommandBuilder =
 //                builder(description = "Quote a message, " + f +
 //                        ", note: using ${instance!!.prefix + instance!!.id} also allows replying to the " +

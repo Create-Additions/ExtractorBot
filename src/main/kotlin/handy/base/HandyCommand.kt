@@ -39,6 +39,7 @@ abstract class HandyCommand(val id: String) : Initable{
         command = ((if (HandyConfig.get().isDev) b.createForServer(api!!.getServerById(HandyConfig.get().mainServer).get()) else b.createGlobal(api))).join()
         commands[command!!.name] = this
         afterCommandRegistered()
+        if(b is HandyCommandBuilder.HandySlashCommand) b.applyPermissions(command!!.id)
     }
 
     open fun afterCommandRegistered() {}
@@ -81,7 +82,12 @@ abstract class HandyCommand(val id: String) : Initable{
 
     fun getNextComponentId() = lastComponentId++
 
-    fun builder(name: String = id, description: String) = SlashCommandBuilder().setName(name).setDescription(description)
+    protected fun builder(name: String = id, description: String) = SlashCommandBuilder().setName(name).setDescription(description)
+    protected fun command(name: String = id, description: String, func: HandyCommandBuilder.() -> Unit): SlashCommandBuilder {
+        val b = HandyCommandBuilder(name, description)
+        func(b)
+        return b.build()
+    }
 
     abstract fun register(): SlashCommandBuilder
     abstract fun onCalled(ctx: SlashCommandInteraction)
