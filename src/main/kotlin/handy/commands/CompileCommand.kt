@@ -163,7 +163,7 @@ class CompileCommand : RawCommand("compile") {
 
     override fun checkForPermissions(event: MessageCreateEvent): Boolean = HandyConfig.get().compileEnabled
     override fun run(event: MessageCreateEvent) {
-        val argsIncludingCmd = event.messageContent.split(" ")
+        val argsIncludingCmd = event.messageContent.split("\n", " ")
         val args = argsIncludingCmd.minus(argsIncludingCmd[0])
         if(args.isEmpty()) {
             event.message.reply("Language argument not provided")
