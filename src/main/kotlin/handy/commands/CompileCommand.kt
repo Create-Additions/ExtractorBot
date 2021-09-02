@@ -14,6 +14,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import org.javacord.api.event.message.MessageCreateEvent
 import java.io.File
+import java.lang.Exception
+import java.net.URL
 import kotlin.text.RegexOption.DOT_MATCHES_ALL
 
 
@@ -174,21 +176,40 @@ class CompileCommand : RawCommand("compile") {
             event.message.reply("Could not find language")
             return
         }
-        var code = args.minus(langName).joinToString(" ").removeSuffix("```")
-        if(code.startsWith("```")) {
-            code.lines().forEach {
-                if(it.startsWith("```")) {
-                    code = code.replaceFirst(it, "")
-                }
-            }
+        var code: String? = null
+        var urlToFetch: String? = null
+        val attachments = event.messageAttachments
+        var url = try {
+            URL(event.readableMessageContent.split(" ")[2]) // readable so that we can ignore < and > which are used to hide attachements
+        } catch (e: Exception) {
+            null
         }
-        if(code.isBlank()) {
-            event.message.reply("No code provided")
-            return
+        if(attachments.isNotEmpty()) {
+            urlToFetch = attachments[0].url.toString()
+        } else if(url != null) {
+            print(url.host)
+            if(url.host == "github.com") {
+                url = url.replaceHost("raw.githubusercontent.com").replaceFile(url.file.replace("/blob", ""))
+            }
+            urlToFetch = url.toString()
+        } else {
+            if(code == null) {
+                code = args.minus(langName)
+                    .joinToString(" ")
+                    .removeSuffix("```")
+                    .replaceFirst("```", "")
+            }
+            if(code.isBlank()) {
+                event.message.reply("No code provided")
+                return
+            }
         }
         runBlocking {
             launch {
-                val out = lang.run(event, code)
+                if(urlToFetch != null && code == null) {
+                    code = HttpClient(CIO).get(urlToFetch)
+                }
+                val out = lang.run(event, code ?: "")
                 var outString = out.toString().replace("`", "\\`")
                 if(outString.length > 330 || outString.split("\n").size > 7) outString = "Output too long, click link below"
                 event.message.reply("```$outString``` ${out.urlNoEmbed() ?: "``Could not get link``"}")
@@ -200,4 +221,12 @@ class CompileCommand : RawCommand("compile") {
 //            }
 //        }
     }
+}
+
+fun URL.replaceHost(newHost: String): URL {
+    return URL(protocol, newHost, file)
+}
+
+fun URL.replaceFile(newFile: String): URL {
+    return URL(protocol, host, newFile)
 }
