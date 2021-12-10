@@ -8,38 +8,38 @@ import org.javacord.api.event.interaction.MessageComponentCreateEvent
 import org.javacord.api.event.interaction.SlashCommandCreateEvent
 import org.javacord.api.interaction.*
 import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder
-import java.util.*
 import java.util.function.BiConsumer
 import java.util.function.Consumer
-import java.util.function.UnaryOperator
 
-abstract class HandyCommand(val id: String) : Subscribable {
-    companion object {
+abstract class HandyCommand(val id: String) : Initable{
+    @SubscribeInitable
+    companion object : Initable {
         private var lastComponentId = 0
         private val components = hashMapOf<String, BiConsumer<MessageComponentCreateEvent, MessageComponentInteraction>>()
+        private val commands = hashMapOf<String, HandyCommand>()
 
-        fun registerComponentSubscriber() {
+        override fun init() {
             api!!.addMessageComponentCreateListener {
                 val interaction = it.messageComponentInteraction
                 if(components.containsKey(interaction.customId)) {
                     components[interaction.customId]!!.accept(it, interaction)
                 }
             }
+            api!!.addSlashCommandCreateListener { event: SlashCommandCreateEvent ->
+                val slashCommandInteraction = event.slashCommandInteraction
+                commands.getOrDefault(slashCommandInteraction.commandName, null)?.onCalled(slashCommandInteraction)
+            }
         }
     }
 
     var command: SlashCommand? = null
 
-    override fun subscribe() {
+    override fun init() {
         val b = register()
         command = ((if (HandyConfig.get().isDev) b.createForServer(api!!.getServerById(HandyConfig.get().mainServer).get()) else b.createGlobal(api))).join()
-        api!!.addSlashCommandCreateListener { event: SlashCommandCreateEvent ->
-            val slashCommandInteraction = event.slashCommandInteraction
-            if (slashCommandInteraction.commandName == command!!.name) {
-                onCalled(slashCommandInteraction)
-            }
-        }
+        commands[command!!.name] = this
         afterCommandRegistered()
+        if(b is HandyCommandBuilder.HandySlashCommand) b.applyPermissions(command!!.id)
     }
 
     open fun afterCommandRegistered() {}
@@ -82,7 +82,12 @@ abstract class HandyCommand(val id: String) : Subscribable {
 
     fun getNextComponentId() = lastComponentId++
 
-    fun builder(name: String = id, description: String) = SlashCommandBuilder().setName(name).setDescription(description)
+    protected fun builder(name: String = id, description: String) = SlashCommandBuilder().setName(name).setDescription(description)
+    protected fun command(name: String = id, description: String, func: HandyCommandBuilder.() -> Unit): SlashCommandBuilder {
+        val b = HandyCommandBuilder(name, description)
+        func(b)
+        return b.build()
+    }
 
     abstract fun register(): SlashCommandBuilder
     abstract fun onCalled(ctx: SlashCommandInteraction)

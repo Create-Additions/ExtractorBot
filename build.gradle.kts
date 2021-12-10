@@ -12,6 +12,7 @@ version = "1.0.0"
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
+    maven("https://repo.eclipse.org/content/groups/releases")
 }
 
 dependencies {
@@ -21,6 +22,13 @@ dependencies {
     implementation("org.reflections:reflections:0.9.12")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
     api("com.github.TheRandomLabs:CurseAPI:master-SNAPSHOT")
+    runtimeOnly("com.google.code.gson:gson:2.8.7")
+    implementation("org.eclipse.mylyn.github:org.eclipse.egit.github.core:5.9.0.202009080501-r")
+    implementation(kotlin("reflect"))
+    implementation("io.ktor:ktor-client-core:1.6.3")
+    implementation("io.ktor:ktor-client-cio:1.6.3")
+    implementation("io.ktor:ktor-client-gson:1.6.3")
+    implementation("io.ktor:ktor-client-mock:1.6.3")
 }
 
 tasks.test {

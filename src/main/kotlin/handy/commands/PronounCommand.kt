@@ -2,12 +2,12 @@ package handy.commands
 
 import handy.base.HandyCommand
 import handy.HandyDiscord.api
-import handy.base.Subscribe
+import handy.base.SubscribeInitable
 import handy.data.HandyPronouns
 import org.javacord.api.entity.permission.Role
 import org.javacord.api.interaction.*
 
-@Subscribe
+@SubscribeInitable
 class PronounCommand : HandyCommand("pronouns") {
     companion object {
         var INSTANCE: PronounCommand? = null
